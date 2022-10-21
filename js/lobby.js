@@ -17,16 +17,6 @@ var noSleep = new NoSleep();
 var players;
 var gameState;
 
-const getSessionId = () => {
-    let cachedSessionId = sessionStorage.getItem('sessionId');
-    if (cachedSessionId !== null && cachedSessionId !== '') {
-        return cachedSessionId;
-    }
-    const sessionId = Math.random().toString(36).substring(2) + Date.now().toString(36);
-    sessionStorage.setItem('sessionId', sessionId);
-};
-
-const sessionId = getSessionId();
 
 const notifyPlayer = () => {
     if (pendingPlayerAction) {
@@ -182,6 +172,12 @@ const setupLobbyFields = () => {
 };
 
 const setupLobby = loaderText => {
+    var sessionId = sessionStorage.getItem('sessionId');
+    if (sessionId === null || sessionId !== '') {
+        sessionId = Math.random().toString(36).substring(2) + Date.now().toString(36);
+    }
+    sessionStorage.setItem('sessionId', sessionId); 
+
     const playerName = sessionStorage.getItem('playerName');
     var lobbyCode = sessionStorage.getItem('lobbyCode');
     document.location.hash = 'lobbyCode=' + lobbyCode;
