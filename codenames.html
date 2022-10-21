@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Codenames | Quarentine Games</title>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/codenames/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/codenames/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/codenames/favicon-16x16.png">
+    <link rel="manifest" href="icons/codenames/site.webmanifest">
+
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+    <meta name="generator" content="DocPad v6.79.4" />
+
+    <link rel="stylesheet" href="./css/icons.css" />
+    <link rel="stylesheet" href="./css/semantic.css" />
+    <link rel="stylesheet" href="./css/styles.css" />
+    <link rel="stylesheet" href="./css/codenames.css" />
+
+    <script src="./js/jquery.js"></script>
+    <script src="./js/semantic.js"></script>
+    <script src="./js/handlebars.js"></script>
+    <script src="./js/noSleep.js"></script>
+
+    <script src="./views/lobbyView.js"></script>
+
+    <script src="./js/utils.js"></script>
+    <script src="./js/socket.js"></script>
+    <script src="./js/lobby.js"></script>
+    <script src="./js/codenames.js"></script>
+</head>
+<body>
+    <div class="ui container hidden grid" id="gameContainer">
+        <div class="row" id="headerRow">
+            <h3 class="ui eight column dividing header">
+                <a class="ui black large button left floated label" id="scoreboard">
+                    Red Team
+                    <div class="detail redTeamScore">0</div>
+                    <div class="detail blueTeamScore">0</div>
+                    Blue Team
+                </a>
+                <a class="ui blue large right floated circular label" id="remainingBlueWords">8</a>
+                <span class="right floated slash">/</span>
+                <a class="ui red large right floated circular label" id="remainingRedWords">9</a>
+                <br /><br />
+                <a class="ui basic large button right floated label restartGame">
+                    Start New Game
+                </a>
+                <a class="ui red large button left floated label" id="becomeSpyMaster">
+                    Become SpyMaster
+                </a>
+                <a class="ui red large button left floated hidden label" id="endTurn">
+                    End Turn
+                </a>
+            </h3>
+        </div>
+        <div class="row" id="gameRow">
+            <div class="tile"><div class="blue word">LEPRECHAUN</div></div>
+            <div class="tile"><div class="neutral word">LEPRECHAUN</div></div>
+            <div class="tile"><div class="neutral word">LEPRECHAUN</div></div>
+            <div class="tile"><div class="neutral word">LEPRECHAUN</div></div>
+            <div class="tile"><div class="neutral disabled word">LEPRECHAUN</div></div>
+            <div class="tile"><div class="black disabled word">LEPRECHAUN</div></div>
+            <div class="tile"><div class="neutral word">LEPRECHAUN</div></div>
+            <div class="tile"><div class="word"></div></div>
+            <div class="tile"><div class="word"></div></div>
+            <div class="tile"><div class="word"></div></div>
+            <div class="tile"><div class="word"></div></div>
+            <div class="tile"><div class="word"></div></div>
+            <div class="tile"><div class="word"></div></div>
+            <div class="tile"><div class="word"></div></div>
+            <div class="tile"><div class="word"></div></div>
+            <div class="tile"><div class="word"></div></div>
+            <div class="tile"><div class="word"></div></div>
+            <div class="tile"><div class="word"></div></div>
+            <div class="tile"><div class="word"></div></div>
+            <div class="tile"><div class="word"></div></div>
+            <div class="tile"><div class="word"></div></div>
+            <div class="tile"><div class="word"></div></div>
+            <div class="tile"><div class="word"></div></div>
+            <div class="tile"><div class="word"></div></div>
+        </div>
+    </div>
+    <div class="ui modal" id="scoreboardView">
+        <div class="zero right margin hidden header" id="winnerHeader">
+            <span id="winnerTeam">Team Red</span> Wins!
+            <a class="ui basic medium button right floated label restartGame">
+                Start New Game
+            </a>
+        </div>
+        <div class="divided header">
+            <a class="ui red large button label">
+                Red Team
+                <div class="detail redTeamScore">0</div>
+            </a>
+        </div>
+        <div class="content">
+            <div class="ui middle aligned large selection list" id="redTeamPlayersList">
+                
+            </div>
+        </div>
+        <div class="divided header">
+            <a class="ui blue large button label">
+                Blue Team
+                <div class="detail blueTeamScore">0</div>
+            </a>
+        </div>
+        <div class="content">
+            <div class="ui middle aligned large selection list" id="blueTeamPlayersList">
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- TEMPLATES -->
+    <script id="wordListTemplate" type="text/x-handlebars-template">
+        {{#each this}}
+        <div class="tile">
+            <div class="{{#if flipped}}flipped{{/if}} {{color}} word" wordIndex={{wordIndex}}>{{word}}</div>
+        </div>
+        {{/each}}
+    </script>
+</body>
+</html>

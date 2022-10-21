@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>29 | Quarentine Games</title>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/29/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/29/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/29/favicon-16x16.png">
+    <link rel="manifest" href="icons/29/site.webmanifest">
+
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+    <meta name="generator" content="DocPad v6.79.4" />
+
+    <link rel="stylesheet" href="./css/icons.css" />
+    <link rel="stylesheet" href="./css/semantic.css" />
+    <link rel="stylesheet" href="./css/styles.css" />
+    <link rel="stylesheet" href="./css/29.css" />
+
+    <script src="./js/jquery.js"></script>
+    <script src="./js/semantic.js"></script>
+    <script src="./js/handlebars.js"></script>
+    <script src="./js/noSleep.js"></script>
+
+    <script src="./views/lobbyView.js"></script>
+
+    <script src="./js/utils.js"></script>
+    <script src="./js/socket.js"></script>
+    <script src="./js/lobby.js"></script>
+    <script src="./js/29.js"></script>
+</head>
+<body>
+    <div class="ui container hidden grid" id="gameContainer">
+        <div class="row" id="headerRow">
+            <h3 class="ui eight column dividing header">
+                <span class="hidden" id="selectTrumpText">Select Trump Card</span>
+                <span class="hidden" id="revealedTrumpText">Trump Card Revealed</span>
+                <a class="ui black large button left floated label" id="scoreboard">
+                    A
+                    <div class="detail teamAScore">0</div>
+                    <div class="detail teamBScore">0</div>
+                    B
+                </a>
+                <a class="ui red large button right floated hidden label" id="forfeit">
+                    Forfeit
+                </a>
+                <a class="ui red large button right floated hidden label" id="revealTrump">
+                    Reveal Trump
+                </a>
+                <a class="ui red large button right floated hidden label" id="setTrump">
+                    Set Trump
+                </a>
+                <a class="ui red large button right floated hidden label" id="showTrump">
+                    Trump
+                    <div class="detail" id="trumpType">Hearts</div>
+                </a>
+            </h3>
+        </div>
+        <div class="centered row" id="playerRow1"></div>
+        <div class="centered row" id="playerRow2"></div>
+        <div class="centered hidden row" id="trumpSelectionContainer">
+            <div class="ui dimmer">
+                <div id="trumpSelectionDimmer">
+                    <div class="trumpSelector trumpImageView imageView heartsSelector" type="hearts">
+                        <i class="large check circle hidden icon trumpSelectorCheck"></i>
+                    </div>
+                    <div class="trumpSelector trumpImageView imageView clubsSelector" type="clubs">
+                        <i class="large check circle hidden icon trumpSelectorCheck"></i>
+                    </div>
+                    <div class="trumpSelector trumpImageView imageView spadesSelector" type="spades">
+                        <i class="large check circle hidden icon trumpSelectorCheck"></i>
+                    </div>
+                    <div class="trumpSelector trumpImageView imageView diamondsSelector" type="diamonds">
+                        <i class="large check circle hidden icon trumpSelectorCheck"></i>
+                    </div>
+                    <div class="hidden trumpRevealer trumpImageView imageView"></div>
+                </div>
+            </div>
+        </div>
+        <div class=" row" id="cardsHeader">
+            <h3 class="ui eight column dividing header" >
+                Your Cards
+                <a class="ui red right floated hidden label" id="targetLabel">
+                    <span id="targetText">Target</span>
+                    <div class="detail" id="target">0</div>
+                </a>
+                <a class="ui red right floated hidden label" id="playCardLoader">
+                    <span id="targetText">Playing</span>
+                    <div class="detail"><i class="loading spinner icon"></i></div>
+                </a>
+            </h3>
+        </div>
+        <div class="centered row" id="cardRow1"></div>
+        <div class="centered row" id="cardRow2"></div>
+        <div class="centered hidden row" id="setTargetRow">
+            <br />
+            <h3 class="ui header" >
+                <a class="ui label" id="lowerTarget">
+                    <i class="icon minus targetActionButtons"></i>
+                </a>
+                <a class="ui basic label" id="setTargetField">23</a>
+                <a class="ui label" id="raiseTarget">
+                    <i class="icon plus targetActionButtons"></i>
+                </a>
+                <a class="ui black button label" id="setTarget">
+                    Set Target
+                </a>
+                <a class="ui red button label" id="passTarget">
+                    Pass
+                </a>
+            </h3>
+        </div>
+    </div>
+
+    <div class="ui modal" id="scoreboardView">
+        <div class="zero right margin hidden header" id="winnerHeader">
+            <span id="winnerTeam">TeamA</span> Wins!
+            <a class="ui basic medium button right floated label" id="restartGame">
+                Start New Game
+            </a>
+        </div>
+        <div class="hidden content" id="winnerContent">
+            <a class="ui basic large button label">
+                Setter Team
+                <div class="detail" id="setterTeam">TeamA</div>
+            </a>
+            <br /><br />
+            <a class="ui basic large button label">
+                Required Points
+                <div class="detail" id="requiredPoints">0</div>
+            </a>
+            <br /><br />
+            <a class="ui basic large button label">
+                Acquired Points
+                <div class="detail" id="acquiredPoints">0</div>
+            </a>
+        </div>
+        <div class="divided header">
+            <a class="ui black large button label">
+                Team A
+                <div class="detail teamAScore">0</div>
+            </a>
+        </div>
+        <div class="content">
+            <div class="ui middle aligned large selection list" id="teamAPlayersList">
+                
+            </div>
+        </div>
+        <div class="divided header">
+            <a class="ui black large button label">
+                Team B
+                <div class="detail teamBScore">0</div>
+            </a>
+        </div>
+        <div class="content">
+            <div class="ui middle aligned large selection list" id="teamBPlayersList">
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- TEMPLATES -->
+    <script id="playedCardTemplate" type="text/x-handlebars-template">
+        <div class="eight wide column zero padding" id="{{playerIndex}}">
+            <div class="ui eight column centered header playerLabel">
+                <img class="ui image playerAvatar" src="./avatars/{{avatarId}}.png" />
+                <span class="playerLabelText">{{playerName}}</span>
+                <div class="ui red circular label hidden playerLabelText playerTarget" id="{{playerIndex}}Target"></div>
+            </div>
+            <div class="row imageView card" style="background-image: url(./cards/{{playedCard}}.png);"></div>
+        </div>
+    </script>
+    <script id="dealtCardsTemplate" type="text/x-handlebars-template">
+        <div class="four wide column zero padding">
+            <div class="row imageView {{canPlay}} clickable card dealtCard" style="background-image: url(./cards/{{dealtCard}}.png);" cardIndex={{cardIndex}}></div>
+        </div>
+    </script>
+</body>
+</html>

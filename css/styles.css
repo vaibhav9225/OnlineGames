@@ -1,0 +1,74 @@
+body {
+    -webkit-tap-highlight-color: transparent !important;
+}
+h3 {
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+}
+::-moz-selection {
+  background: transparent;
+}
+
+::selection {
+  background: transparent;
+}
+.disabled{
+  pointer-events: none;
+}
+.hidden {
+    display: none !important;
+}
+.rounded {
+    border-radius: 5px;
+}
+.hidden.row {
+    display: none !important;
+}
+.hidden.icon {
+    display: none !important;
+}
+.right.floated {
+    float: right;
+}
+.left.floated {
+    float: left;
+}
+.imageView {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-origin: content-box;
+    cursor: pointer;
+    filter: drop-shadow(0px 1px 2px black);
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+}
+.imageView:active {
+    filter: drop-shadow(0px 0px 1px black);
+}
+.zero.padding {
+    padding: 0 !important;
+}
+.zero.margin {
+    margin: 0 !important;
+}
+.zero.left.margin {
+    margin-left: 0 !important;
+}
+.zero.right.margin {
+    margin-right: 0 !important;
+}
+
+#lobby .header {
+    padding-right: 14px !important;
+}
+#lobbyCodeLabel {
+    margin-left: 6px !important;
+    padding-left: 6px !important;
+    border-left: 1px solid #888;
+}
+.copyLabel {
+    margin-left: 6px !important;
+    padding-left: 6px !important;
+    border-left: 1px solid #888; 
+}

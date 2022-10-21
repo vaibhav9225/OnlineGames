@@ -1,0 +1,107 @@
+#gameContainer {
+    height: 100%;
+}
+#headerRow {
+    padding: 0;
+    margin-top: 40px;
+}
+#becomeSpyMaster, #endTurn {
+    position: relative;
+    top: -3px;
+    margin-left: 0;
+}
+.slash {
+    padding-left: 5px;
+}
+#gameRow {
+    height: 80%;
+}
+.tile {
+    height: 15%;
+    width: 25%;
+    padding: 0 6px;
+    position: relative;
+    display: table;
+    text-align: center;
+}
+.word {
+    width: 100%;
+    height: 100%;
+    padding: 0 4px;
+    display: table-cell;
+    vertical-align: middle;
+    font-size: 3vh;
+    word-wrap: break-word;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0px 1px 2px #CCC;
+}
+@media only screen 
+  and (min-device-width: 300px) 
+  and (max-device-width: 600px) 
+  and (max-device-height: 900px) {
+    .word {
+        font-size: 1.6vh;
+    }
+}
+.word:active {
+    box-shadow: 0px 0px 0px #CCC;
+}
+.neutral.word {
+    color: #111;
+    cursor: pointer;
+    background-color: #F2F2F2;
+}
+.blue.word {
+    color: #5F98E3;
+    background-color: #F2F2F2;
+    pointer-events: none;
+}
+.red.word {
+    color: #E06363;
+    background-color: #F2F2F2;
+    pointer-events: none;
+}
+.yellow.word {
+    color: #f2be43;
+    background-color: #F2F2F2;
+    pointer-events: none;
+}
+.black.word {
+    color: #333;
+    background-color: #E2E2E2;
+    pointer-events: none;
+}
+.flipped.blue.word {
+    color: white;
+    background-color: #5F98E3;
+    pointer-events: none;
+}
+.flipped.red.word {
+    color: white;
+    background-color: #E06363;
+    pointer-events: none;
+}
+.flipped.yellow.word {
+    color: black;
+    background-color: #FFE9B0;
+    pointer-events: none;
+}
+.flipped.black.word {
+    color: white;
+    background-color: #333;
+    pointer-events: none;
+}
+#scoreboard {
+    margin-left: 0;
+}
+#headerRow .redTeamScore {
+    margin-left: 10px;
+    margin-right: 6px;
+}
+#headerRow .blueTeamScore {
+    padding-left: 7px;
+    margin-left: 0px;
+    margin-right: 10px;
+    border-left: 1px solid #888;
+}
