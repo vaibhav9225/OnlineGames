@@ -13,10 +13,23 @@ var splashSize = 'small';
 var splashInProgress = false;
 var notification = new audioElement('./audio/notification.mp3');
 var pendingPlayerAction = false;
-var noSleep = new NoSleep();
 var players;
 var gameState;
 
+const isMobile = () => {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    return isMobile;
+}
+
+const checkAutoLogin = () => {
+    const autoLogin = sessionStorage.getItem('autoLoginEnabled');
+    if (autoLogin === 'true' && isMobile()) { // FIX THIS
+        sessionStorage.setItem('autoLoginEnabled', false);
+        $(document).ready(function() {
+            setupLobby('Joining Party');
+        });
+    }
+}
 
 const notifyPlayer = () => {
     if (pendingPlayerAction) {
@@ -24,10 +37,6 @@ const notifyPlayer = () => {
     }
     pendingPlayerAction = true;
     notification.play();
-};
-
-const enableNoSleep = () => {
-    noSleep.enable();
 };
 
 const clearPendingAction = () => {
@@ -173,13 +182,18 @@ const setupLobbyFields = () => {
 
 const setupLobby = loaderText => {
     var sessionId = sessionStorage.getItem('sessionId');
-    if (sessionId === null || sessionId !== '') {
+    if (sessionId === null || sessionId === '') {
         sessionId = Math.random().toString(36).substring(2) + Date.now().toString(36);
     }
-    sessionStorage.setItem('sessionId', sessionId); 
+    sessionStorage.setItem('sessionId', sessionId);
 
     const playerName = sessionStorage.getItem('playerName');
-    var lobbyCode = sessionStorage.getItem('lobbyCode');
+    const lobbyCode = sessionStorage.getItem('lobbyCode');
+
+    if (playerName === null || playerName === '' || lobbyCode === null || lobbyCode === '') {
+        return;
+    }
+
     document.location.hash = 'lobbyCode=' + lobbyCode;
     const payload = {
         action: 'joinLobby',
@@ -198,6 +212,9 @@ const disableRightClick = () => {
 };
 
 // Setup Message Handlers
+onSocketOpen = () => {
+    checkAutoLogin();
+};
 messageHandlers = {
     refreshLobby,
     refreshGame,
@@ -229,14 +246,12 @@ $('#lobbyCode').on('keyup', function() {
 $('#createLobby').on('click', function() {
     sessionStorage.setItem('lobbyCode', generateLobbyCode());
     setupLobby('Creating Party');
-    notification.bypassPermissions();
-    enableNoSleep();
+    //notification.bypassPermissions();
 });
 
 $('#joinLobby').on('click', function() {
     setupLobby('Joining Party');
-    notification.bypassPermissions();
-    enableNoSleep();
+    //notification.bypassPermissions();
 });
 
 $(document).on('click', '#lobbyCodeContainer', function() {
@@ -282,9 +297,18 @@ setButtonState(
 setupConnection();
 disableRightClick();
 
+var needsRefresh = false;
 function visibilityChangeListener() {
-    if (document.visibilityState !== 'visible') {
-        alert('Game Backgrounded!');
+    if (!isMobile()) {
+        return;
+    }
+    
+    if (document.visibilityState === 'hidden') {
+        needsRefresh = true;
+    } else if (needsRefresh === true) {
+        needsRefresh = false;
+        sessionStorage.setItem('autoLoginEnabled', true);
+        location.reload();
     }
 }
 
