@@ -3,6 +3,7 @@ const { Utils } = require('Utils');
 const { Lobby } = require('Lobby');
 const { Codenames } = require('Codenames');
 const { TwentyNine } = require('TwentyNine');
+const { Splendor } = require('Splendor');
 
 const dynamoDb = new DynamoDB.DocumentClient({
     api_version: '2012-08-10',
@@ -15,7 +16,8 @@ const INITIAL_STATE = {
 };
 const GameHandlers = {
     Codenames,
-    TwentyNine
+    TwentyNine,
+    Splendor
 };
 
 class Game {
@@ -33,7 +35,7 @@ class Game {
         return result.Item.gameState;
     }
     
-    async setState(lobbyCode, gameState) {
+    async setState(lobbyCode, gameState, dispatch) {
         var params = {
             TableName : GAMES_TABLE,
             Item: {
@@ -42,6 +44,14 @@ class Game {
             }
         };
         await dynamoDb.put(params).promise();
+        await dispatch(gameState);
+        
+        const handler = GameHandlers[gameState.gameName];
+        if (typeof handler !== 'undefined') {
+            await handler.handleBotPlay(gameState, async updatedState => {
+                await this.setState(lobbyCode, updatedState, dispatch);
+            })
+        }
     }
     
     async gameExists(lobbyCode) {
@@ -57,8 +67,7 @@ class Game {
         await handler.restart(gameState, async refreshedState => {
             var updatedState = refreshedState;
             updatedState.gameName = gameName;
-            await this.setState(lobbyCode, updatedState);
-            await dispatch(updatedState);
+            await this.setState(lobbyCode, updatedState, dispatch);
         });
     }
     
@@ -77,8 +86,7 @@ class Game {
         await handler.start(sessionIds, async gameState => {
             var newState = gameState;
             newState.gameName = gameName;
-            await this.setState(lobbyCode, newState);
-            await dispatch(newState);
+            await this.setState(lobbyCode, newState, dispatch);
         });
     }
     
@@ -99,8 +107,7 @@ class Game {
             return INITIAL_STATE;
         }
         await handler.updateState(gameState, sessionId, playerState, async updatedState => {
-            await this.setState(lobbyCode, updatedState);
-            await dispatch(updatedState);
+            await this.setState(lobbyCode, updatedState, dispatch);
         });
     }
     
@@ -114,8 +121,7 @@ class Game {
             return;
         }
         await handler.handlePlayerEntry(gameState, sessionId, async updatedState => {
-            await this.setState(lobbyCode, updatedState);
-            await dispatch(updatedState);
+            await this.setState(lobbyCode, updatedState, dispatch);
         });
     }
     
@@ -129,8 +135,7 @@ class Game {
             return;
         }
         await handler.handlePlayerExit(gameState, sessionId, async updatedState => {
-            await this.setState(lobbyCode, updatedState);
-            await dispatch(updatedState);
+            await this.setState(lobbyCode, updatedState, dispatch);
         });
     }
 }
