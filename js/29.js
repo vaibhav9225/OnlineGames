@@ -14,7 +14,7 @@ const PLAYER_THREE = 2;
 const PLAYER_FOUR = 3;
 
 // Overrides
-minPlayersRequired = 4;
+minPlayersRequired = 1;
 gameName = 'TwentyNine';
 splashImage = getSplashUrl('/splash/29.png');
 splashSize = 'small';
@@ -153,9 +153,16 @@ const showCardRows = () => {
             canPlay: card.canPlay ? '' : 'disabled'
         }, RenderType.append);
     }
+    $('#cardRow1').removeClass('disabled');
+    $('#cardRow2').removeClass('disabled');
     $('#cardRow1').removeClass('hidden');
     $('#cardRow2').removeClass('hidden');
     $('#setTargetRow').addClass('hidden');
+};
+
+const disabledCardRows = () => {
+    $('#cardRow1').addClass('disabled');
+    $('#cardRow2').addClass('disabled');
 };
 
 const removeLoadingStates = () => {
@@ -281,6 +288,8 @@ refreshGameDelegate = payload => {
     }
     if (isTrumpRevealed && !isRevealNotified) {
         showTrumpRevealedDimmer();
+        disabledCardRows();
+    } else if  (isTrumpRevealed && isRevealNotified) {
         showCardRows();
     }
     showTarget();
