@@ -1,6 +1,7 @@
 // Constants
 const PLAYER_PREFIX = 'player';
 const NO_PLAYER = '<No Player>';
+const BOT_PLAYER = 'BOT';
 const DEFAULT_AVATAR_ID = '0';
 
 // Global Variables
@@ -105,7 +106,7 @@ const getGamePlayers = sessionIds => {
     for (var i = 0; i < sessionIds.length; i++) {
         const playerIndex = PLAYER_PREFIX + i;
         const sessionId = sessionIds[i];
-        const player = players[sessionId] || { playerName: NO_PLAYER, avatarId: DEFAULT_AVATAR_ID };
+        const player = players[sessionId] || { playerName: sessionId == 'BOT_SESSION' ? BOT_PLAYER : NO_PLAYER, avatarId: DEFAULT_AVATAR_ID };
         gamePlayers.push({
             playerIndex,
             playerName: player.playerName,
