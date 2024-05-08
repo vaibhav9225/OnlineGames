@@ -796,16 +796,16 @@ class TwentyNine {
                     } else if (highestSameSuiteCard.name === '9') { // If 9, play it if bot can win with it based on memory of if jack was played
                         // Compute the jacks that have been played already
                         var jacksPlayed = {
-                            'diamonds': false, 'spades': false, 'clubs': false, 'hearts': false
+                            'diamonds': true, 'spades': true, 'clubs': true, 'hearts': true
                         };
                         gameState.dealtCards.forEach((playerCards, playerIndex) => {
                             if (playerIndex == gameState.turn) {
-                                return
+                                return;
                             }
                             
                             playerCards.forEach((card, index) => {
                                 if (card.name === 'jack') {
-                                    jacksPlayed[card.type] = true;
+                                    jacksPlayed[card.type] = false;
                                 }
                             });
                         });
