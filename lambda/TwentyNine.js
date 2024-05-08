@@ -634,7 +634,7 @@ class TwentyNine {
                     botState.requiredPoints = playerTarget.minRequiredPoints;
                 }
                 botState.requiredPoints = playerTarget.minRequiredPoints;
-            } else if (maxSuiteScore >= 44 && playerTarget.minRequiredPoints <= 17) { // If score >= 44, raise, with maximum target of 17
+            } else if (maxSuiteScore >= 43 && playerTarget.minRequiredPoints <= 17) { // If score >= 43, raise, with maximum target of 17
                 if (isTeamMateSetting && !canOverrideSeventeen) { // If teammate is setting and can't override teammate, pass
                     botState.hasPassed = true;
                 } else { // Set the target
