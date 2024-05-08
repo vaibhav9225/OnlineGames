@@ -41,7 +41,7 @@ const generateCards = () => {
             cards.push({
                 name: card.name,
                 value: card.value,
-                score: (card.value + 1) * card.level, // 32, 21, 12, 10, 4, 5, 6, 1
+                score: (card.value + 1) * card.level, // 32, 21, 12, 10, 4, 3, 2, 1
                 cardRank,
                 type
             });
@@ -606,26 +606,35 @@ class TwentyNine {
             botState.requiredPoints = MIN_REQUIRED_POINTS;
         } else { // Calculate the card strength and decide what to do
             const botCards = gameState.dealtCards[gameState.turn].slice(0, CARDS_PER_PLAYER / 2);
-            var totalScore = 0;
-        
+            
+            var maxSuite;
+            var maxSuiteScore = 0;
+            var typeToScoreMapping = {
+                'diamonds': 0, 'spades': 0, 'clubs': 0, 'hearts': 0
+            };
             botCards.forEach((card, index) => {
-                totalScore = totalScore + card.score;
-            })
+                typeToScoreMapping[card.type] = typeToScoreMapping[card.type] + card.score;
+                
+                if (typeToScoreMapping[card.type] > maxSuiteScore) {
+                    maxSuiteScore = typeToScoreMapping[card.type];
+                    maxSuite = card.type;
+                }
+            });
             
             // Check if teammate is the one setting before raising target
             const teamMateIndex = (gameState.turn + 2) % REQUIRED_PLAYERS;
             const isTeamMateSetting = !gameState.playerTargets[teamMateIndex].hasPassed && gameState.playerTargets[teamMateIndex].requiredPoints > 0;
             const canOverrideSeventeen = Math.random() < 0.5; // Overrides 50% of times
-            const canOverrideEighteen = Math.random() < 0.3; // Overrides 30% of times
+            const canOverrideEighteen = Math.random() < 0.5; // Overrides 50% of times
             
-            if (totalScore > 45 && playerTarget.minRequiredPoints <= 18 && !isTeamMateSetting) { // If score > 40, raise, with maximum target of 18
+            if (maxSuiteScore >= 54 && playerTarget.minRequiredPoints <= 18 && !isTeamMateSetting) { // If score >= 54, raise, with maximum target of 18
                 if (!canOverrideEighteen) { // If teammate is setting and can't override teammate, pass
                     botState.hasPassed = true;
                 } else { // Set the target
                     botState.requiredPoints = playerTarget.minRequiredPoints;
                 }
                 botState.requiredPoints = playerTarget.minRequiredPoints;
-            } else if (totalScore > 30 && playerTarget.minRequiredPoints <= 17) { // If score > 40, raise, with maximum target of 17
+            } else if (maxSuiteScore >= 44 && playerTarget.minRequiredPoints <= 17) { // If score >= 44, raise, with maximum target of 17
                 if (isTeamMateSetting && !canOverrideSeventeen) { // If teammate is setting and can't override teammate, pass
                     botState.hasPassed = true;
                 } else { // Set the target
@@ -644,6 +653,7 @@ class TwentyNine {
         
         // Always select suite with maximum score
         const botCards = gameState.dealtCards[gameState.turn].slice(0, CARDS_PER_PLAYER / 2);
+        
         var maxSuite;
         var maxSuiteScore = 0;
         var typeToScoreMapping = {
