@@ -9,7 +9,8 @@ const TOTAL_ROUNDS = 8;
 const MIN_REQUIRED_POINTS = 16;
 const MAX_GAME_POINTS = 29;
 const TRUMP_CARD_MULTIPLIER = 100;
-const STATE_TRANSITION_TIME = 5000;
+const STATE_TRANSITION_TIME = 3000;
+const TRUMP_REVEAL_TRANSITION_TIME = 2000;
 const BOT_TRANSITION_TIME = 1000;
 const BOT_SESSION = "BOT_SESSION";
 
@@ -503,7 +504,7 @@ class TwentyNine {
         updatedState.trumpCard.revealedAfter = gameState.completedRounds;
         await dispatch(updatedState);
         updatedState.trumpCard.isRevealNotified = true;
-        await Utils.sleep(STATE_TRANSITION_TIME);
+        await Utils.sleep(TRUMP_REVEAL_TRANSITION_TIME);
         await dispatch(updatedState);
     }
     
