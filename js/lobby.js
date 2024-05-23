@@ -8,7 +8,7 @@ const DEFAULT_AVATAR_ID = '0';
 var gameName = 'Quarentine Games';
 var isGameActive = false;
 var minPlayersRequired = 14;
-var splashDuration = 2000;
+var splashDuration = 250;
 var splashImage = '';
 var splashSize = 'small';
 var splashInProgress = false;
@@ -75,7 +75,7 @@ const showSplash = () => {
     splashInProgress = true;
     $('#splashImageContainer').addClass(splashSize);
     $('#splashImage').attr('src', splashImage);
-    $('#splash').dimmer('show');
+    $('#splash').dimmer('show', { show : 250, hide : 250 });
     setTimeout(() => {
         splashInProgress = false;
         $('#splash').dimmer('hide');
