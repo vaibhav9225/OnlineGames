@@ -673,7 +673,7 @@ class TwentyNine {
         return botState;        
     }
     
-    computeWinnerIndex(playedCards) {
+    computeWinner(playedCards) {
         const winner = playedCards.reduce((currentWinner, playedCard) => {
                 var updatedWinner = currentWinner;
                 updatedWinner.points += playedCard.value;
@@ -683,7 +683,7 @@ class TwentyNine {
                 }
                 return updatedWinner;
             }, { score: 0, points: 0, playerIndex: null });
-        return winner.playerIndex;
+        return winner;
     }
     
     computePlayRoundState(gameState) {
@@ -693,6 +693,7 @@ class TwentyNine {
         const botCardIndices = botCards.map((value, index) => index);
         
         const botsTurnFirst = gameState.playedCards.length == 0;
+        const botRevealedTrump = (TOTAL_ROUNDS - gameState.trumpCard.revealedAfter) == botCards.length && gameState.trumpCard.revealedBy == gameState.turn; // Bot revealed the trump
         
         if (botsTurnFirst) { // If bots turn, pick highest if Jack, else pick lowest
             const highestCardIndex = getHighestScoreCardIndex(botCards, botCardIndices, false); // (include jacks)
@@ -707,12 +708,14 @@ class TwentyNine {
                 botState.playedCardIndex = getLowestScoreCardIndex(botCards, botCardIndices);
                 // botState.playedCardIndex = Math.floor(Math.random() * botCards.length); 
             }
-        } else { // Pick random from same suite (if exists), else always revel trump if needed
+        } else { // Pick from same suite (if exists), else always revel trump if needed
             const firstCardType = gameState.playedCards[0].type;
             
             // Check if team mate is winning
             const teamMateIndex = (gameState.turn + 2) % REQUIRED_PLAYERS;
-            const isTeamMateWinning = teamMateIndex == this.computeWinnerIndex(gameState.playedCards);
+            const winner = this.computeWinner(gameState.playedCards);
+            const isTeamMateWinning = teamMateIndex == winner.playerIndex;
+            const isTeamMateWinningAndScoring = teamMateIndex == winner.playerIndex && winner.points > 0;
             
             // Calculate same, trump, non-trump suites that bot has
             var sameSuiteCards = [];
@@ -734,42 +737,41 @@ class TwentyNine {
                 }
             });
             
-            if (sameSuiteCards.length == 0) { // Reveal trump if needed, else play ramdon trump / random card
+            if (sameSuiteCards.length == 0) { // Reveal trump if needed, else play random trump / random card
                 if (!gameState.trumpCard.isRevealed && !isTeamMateWinning) { // Reveal trump if teammate is not winning
                     botState.revealTrump = true;
                 } else { // Play lowest trump if teammate not winning, else play smartly based on if trump is revealed or not
                     if (gameState.trumpCard.isRevealed && trumpSuiteCards.length > 0 && !isTeamMateWinning) { // Play trump card if teammate not winning
                         const highestTrumpSuiteCardIndex = getHighestScoreCardIndex(trumpSuiteCards, trumpSuiteCardIndices, false); // (include jacks)
-                        const highestTrumpSuiteCard = botCards[highestTrumpSuiteCardIndex];
+                        const highestTrumpSuiteCard = updateCardScores({ ...botCards[highestTrumpSuiteCardIndex] }, gameState.trumpCard, gameState.playedCards); // (with updated score)
                         
                         const lowestTrumpSuiteCardIndex = getLowestScoreCardIndex(trumpSuiteCards, trumpSuiteCardIndices);
-                        const lowestTrumpSuiteCard = botCards[lowestTrumpSuiteCardIndex];
+                        const lowestTrumpSuiteCard = updateCardScores({ ...botCards[lowestTrumpSuiteCardIndex] }, gameState.trumpCard, gameState.playedCards); // (with updated score)
                         
                         // Compute winner if lowest trump card is played
-                        var winnerIndex = this.computeWinnerIndex([...gameState.playedCards, { ...lowestTrumpSuiteCard, playerIndex: gameState.turn}]);
-                        if (winnerIndex == gameState.turn) { // Play lowest trump if can win with that
+                        var potentialWinner = this.computeWinner([...gameState.playedCards, { ...lowestTrumpSuiteCard, playerIndex: gameState.turn}]);
+                        if (potentialWinner.playerIndex == gameState.turn) { // Play lowest trump if can win with that
                             botState.playedCardIndex = lowestTrumpSuiteCardIndex;
                         } else { // See if bot can win with highest trump
                             // Compute winner if highest trump card is played
-                            winnerIndex = this.computeWinnerIndex([...gameState.playedCards, { ...highestTrumpSuiteCard, playerIndex: gameState.turn}]);
-                            if (winnerIndex == gameState.turn) { // Play highest trump if can win with that
+                            potentialWinner = this.computeWinner([...gameState.playedCards, { ...highestTrumpSuiteCard, playerIndex: gameState.turn}]);
+                            if (potentialWinner.playerIndex == gameState.turn) { // Play highest trump if can win with that
                                 botState.playedCardIndex = highestTrumpSuiteCardIndex;
-                            } else { // Play lowest from all cards
-                                if (nonTrumpSuiteCards.length > 0) { // Play lowest from non-trump card, if it exists
+                            } else { // Play lowest card
+                                if (nonTrumpSuiteCards.length > 0 && !botRevealedTrump) { // Play lowest from non-trump card, if it exists & bot didn't reveal trump
                                     botState.playedCardIndex = getLowestScoreCardIndex(nonTrumpSuiteCards, nonTrumpSuiteCardIndices);
                                 } else { // Play lowest from all cards
-                                    botState.playedCardIndex = getLowestScoreCardIndex(botCards, botCardIndices);
+                                    botState.playedCardIndex = getLowestScoreCardIndex(trumpSuiteCards, trumpSuiteCardIndices);
                                 }
                             }
                         }
-                        botState.playedCardIndex = getLowestScoreCardIndex(trumpSuiteCards, trumpSuiteCardIndices);
                     } else { // Pick highest from all cards if teammate winning, else play lowest
-                        if (isTeamMateWinning) { // Play highest from non-trump cards (if they exist), else play trump
+                        if (isTeamMateWinningAndScoring) { // Play highest from non-trump cards (if they exist), else play trump
                             if (gameState.trumpCard.isRevealed) { // If trump card revealed, play accodingly
-                                if (nonTrumpSuiteCards.length > 0) { // Play highest from non-trump card, if it exists
+                                if (nonTrumpSuiteCards.length > 0 && !botRevealedTrump) { // Play highest from non-trump card, if it exists
                                     botState.playedCardIndex = getHighestScoreCardIndex(nonTrumpSuiteCards, nonTrumpSuiteCardIndices, true); // (exclude jacks)
-                                } else {
-                                    botState.playedCardIndex = getHighestScoreCardIndex(trumpSuiteCards, trumpSuiteCardIndices, true); // (exclude jacks)
+                                } else { // Play lowest trump card
+                                    botState.playedCardIndex = getLowestScoreCardIndex(trumpSuiteCards, trumpSuiteCardIndices, true); // (exclude jacks)
                                 }
                             } else { // Play highest from all cards
                                 botState.playedCardIndex = getHighestScoreCardIndex(botCards, botCardIndices, true); // (exclude jacks)
@@ -781,15 +783,15 @@ class TwentyNine {
                 }
             } else { // Pick highest from same suite if teammate winning, else play lowest
                 if (isTeamMateWinning) { // Play highest
-                    botState.playedCardIndex = getHighestScoreCardIndex(sameSuiteCards, sameSuiteCardIndices, true); // (exclude jacks)
+                    botState.playedCardIndex = getHighestScoreCardIndex(sameSuiteCards, sameSuiteCardIndices, false); // (include jacks)
                 } else { // If can win with its card, play highest, else play lowest card
                     const highestSameSuiteCardIndex = getHighestScoreCardIndex(sameSuiteCards, sameSuiteCardIndices, false); // (include jacks)
                     const highestSameSuiteCard = botCards[highestSameSuiteCardIndex];
                     
                     // Compute winner if best card is played
-                    const winnerIndex = this.computeWinnerIndex([...gameState.playedCards, { ...highestSameSuiteCard, playerIndex: gameState.turn}]);
+                    const winner = this.computeWinner([...gameState.playedCards, { ...highestSameSuiteCard, playerIndex: gameState.turn }]);
                     
-                    var canWinWithHighestSuiteCard = winnerIndex == gameState.turn;
+                    var canWinWithHighestSuiteCard = winner.playerIndex == gameState.turn;
                     
                     if (highestSameSuiteCard.name === 'jack') { // If highest suit card is jack, play it if bot can win with it
                         canWinWithHighestSuiteCard = canWinWithHighestSuiteCard && true;
